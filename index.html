@@ -1,0 +1,121 @@
+
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slanec Georgia — Кастомные сланцы</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo">🩴 Slanec Georgia</div>
+  <nav>
+    <a href="index.html">Главная</a>
+    <a href="cart.html">Корзина</a>
+    <a href="about.html">О нас</a>
+    <a href="faq.html">FAQ</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div class="hero-logo">🩴</div>
+    <h1>Создай свои идеальные сланцы</h1>
+    <p class="hero-text">
+      Кастомные сланцы, сделанные в Грузии. Выбирай размер, форму и цвета — мы сделаем остальное.
+    </p>
+  </section>
+
+  <section class="constructor">
+    <form id="productForm">
+      <div class="field">
+        <label>Размер</label>
+        <div class="options">
+          <label><input type="radio" name="size" value="US 6 / EU 38 / 24 см" required> US 6 · EU 38 · 24 см</label>
+          <label><input type="radio" name="size" value="US 7 / EU 39 / 25 см"> US 7 · EU 39 · 25 см</label>
+          <label><input type="radio" name="size" value="US 8 / EU 41 / 26 см"> US 8 · EU 41 · 26 см</label>
+          <label><input type="radio" name="size" value="US 9 / EU 42 / 27 см"> US 9 · EU 42 · 27 см</label>
+          <label><input type="radio" name="size" value="US 10 / EU 43 / 28 см"> US 10 · EU 43 · 28 см</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Форма</label>
+        <div class="options">
+          <label><input type="radio" name="shape" value="Стандартная" required> Стандартная</label>
+          <label><input type="radio" name="shape" value="Узкая"> Узкая</label>
+          <label><input type="radio" name="shape" value="Широкая"> Широкая</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Цвет подошвы</label>
+        <div class="options colors">
+          <label><input type="radio" name="soleColor" value="Черный" required><span class="swatch black"></span>Черный</label>
+          <label><input type="radio" name="soleColor" value="Белый"><span class="swatch white"></span>Белый</label>
+          <label><input type="radio" name="soleColor" value="Синий"><span class="swatch blue"></span>Синий</label>
+          <label><input type="radio" name="soleColor" value="Зеленый"><span class="swatch green"></span>Зеленый</label>
+          <label><input type="radio" name="soleColor" value="Красный"><span class="swatch red"></span>Красный</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Цвет ремешка</label>
+        <div class="options colors">
+          <label><input type="radio" name="strapColor" value="Черный" required><span class="swatch black"></span>Черный</label>
+          <label><input type="radio" name="strapColor" value="Белый"><span class="swatch white"></span>Белый</label>
+          <label><input type="radio" name="strapColor" value="Синий"><span class="swatch blue"></span>Синий</label>
+          <label><input type="radio" name="strapColor" value="Зеленый"><span class="swatch green"></span>Зеленый</label>
+          <label><input type="radio" name="strapColor" value="Красный"><span class="swatch red"></span>Красный</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Комментарий к заказу (необязательно)</label>
+        <textarea name="comment" maxlength="500" placeholder="Ваш комментарий (до 500 символов)"></textarea>
+      </div>
+
+      <p class="price bottom-price">
+        Цена: <strong>95 GEL</strong> самовывоз / <strong>100 GEL</strong> с доставкой
+      </p>
+
+      <button type="submit" class="order-btn">Заказ</button>
+    </form>
+
+    <p id="successMessage" class="success hidden">
+      Сланцы в корзине и ждут любого вашего решения
+    </p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  © 2026 Slanec Georgia. Все права защищены.
+</footer>
+
+<script>
+  const form = document.getElementById('productForm');
+  const message = document.getElementById('successMessage');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const data = new FormData(form);
+    const item = {
+      size: data.get('size'),
+      shape: data.get('shape'),
+      soleColor: data.get('soleColor'),
+      strapColor: data.get('strapColor'),
+      comment: data.get('comment') || ''
+    };
+
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    cart.push(item);
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    form.reset();
+    message.classList.remove('hidden');
+  });
+</script>
+</body>
+</html>

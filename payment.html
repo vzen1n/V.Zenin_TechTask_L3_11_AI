@@ -1,0 +1,173 @@
+
+<!-- payment.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Оплата — Slanec Georgia</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🩴 Slanec Georgia</div>
+  <nav>
+    <a href="index.html">Главная</a>
+    <a href="cart.html">Корзина</a>
+    <a href="about.html">О нас</a>
+    <a href="faq.html">FAQ</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="constructor">
+    <h1 style="text-align:center;margin-bottom:32px;">Оплата</h1>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;">
+      <!-- Заказ -->
+      <div>
+        <h2>Ваш заказ</h2>
+        <div id="orderList"></div>
+      </div>
+
+      <!-- Форма -->
+      <div>
+        <h2>Контактные данные</h2>
+
+        <div class="field">
+          <label>Ваше имя *</label>
+          <input type="text" id="nameInput">
+        </div>
+
+        <div class="field">
+          <label>Телефон или мессенджер (укажите какой) *</label>
+          <input
+            type="text"
+            id="contactInput"
+            placeholder="Например: Telegram / WhatsApp +995..."
+          >
+        </div>
+
+        <div class="field hidden" id="deliveryAddress">
+          <label>Адрес доставки</label>
+          <textarea placeholder="Улица, дом, квартира"></textarea>
+        </div>
+
+        <div class="field hidden" id="pickupInfo">
+          <strong>Адреса самовывоза:</strong><br><br>
+          Тбилиси — ул. Свободы, д. 10<br>
+          Батуми — ул. Морская, д. 7<br>
+          Кутаиси — ул. Центральная, д. 3
+        </div>
+
+        <p style="margin-top:24px;">
+          Оплата возможна наличными или банковской картой
+        </p>
+
+        <button class="order-btn" onclick="pay()">Оплатить</button>
+
+        <p id="error" style="margin-top:12px;color:#c53030;" class="hidden"></p>
+
+        <p id="thanks" class="success hidden">
+          Спасибо, что решили доверить именно нам комфорт ваших ног.
+          В ближайшее время с вами свяжется менеджер и уточнит все детали.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  © 2026 Slanec Georgia. Все права защищены.
+</footer>
+
+<script>
+function getCart() {
+  return JSON.parse(localStorage.getItem('cart') || '[]');
+}
+
+function getDeliveryType() {
+  return localStorage.getItem('delivery') || 'pickup';
+}
+
+function renderOrder() {
+  const list = document.getElementById('orderList');
+  const cart = getCart();
+  list.innerHTML = '';
+  let total = 0;
+
+  cart.forEach(item => {
+    const div = document.createElement('div');
+    div.style.marginBottom = '12px';
+
+    if (!item.type) {
+      total += 95;
+      div.innerHTML = `
+        <strong>Сланцы</strong><br>
+        ${item.size}, ${item.shape}<br>
+        Подошва: ${item.soleColor}, ремешок: ${item.strapColor}<br>
+        Цена: 95 GEL
+      `;
+    } else {
+      total += item.price;
+      div.innerHTML = `
+        <strong>${item.name}</strong><br>
+        Цена: ${item.price} GEL
+      `;
+    }
+    list.appendChild(div);
+  });
+
+  if (getDeliveryType() === 'delivery') {
+    total += 5;
+    const delivery = document.createElement('div');
+    delivery.innerHTML = `Цена доставки: 5 GEL`;
+    list.appendChild(delivery);
+  }
+
+  const totalDiv = document.createElement('div');
+  totalDiv.style.marginTop = '16px';
+  totalDiv.innerHTML = `<strong>Итого: ${total} GEL</strong>`;
+  list.appendChild(totalDiv);
+}
+
+function applyDeliveryUI() {
+  const isDelivery = getDeliveryType() === 'delivery';
+  document.getElementById('deliveryAddress').classList.toggle('hidden', !isDelivery);
+  document.getElementById('pickupInfo').classList.toggle('hidden', isDelivery);
+}
+
+function pay() {
+  const name = document.getElementById('nameInput').value.trim();
+  const contact = document.getElementById('contactInput').value.trim();
+  const error = document.getElementById('error');
+
+  error.classList.add('hidden');
+  error.textContent = '';
+
+  if (name.length < 1) {
+    error.textContent = 'Пожалуйста, укажите ваше имя.';
+    error.classList.remove('hidden');
+    return;
+  }
+
+  if (contact.length < 6) {
+    error.textContent = 'Пожалуйста, укажите корректный телефон или мессенджер.';
+    error.classList.remove('hidden');
+    return;
+  }
+
+  /* УСПЕШНАЯ "ОПЛАТА" */
+  document.getElementById('thanks').classList.remove('hidden');
+
+  /* ОЧИСТКА КОРЗИНЫ И ДОСТАВКИ */
+  localStorage.removeItem('cart');
+  localStorage.removeItem('delivery');
+}
+
+renderOrder();
+applyDeliveryUI();
+</script>
+
+</body>
+</html>

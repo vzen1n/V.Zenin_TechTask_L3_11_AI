@@ -1,0 +1,214 @@
+
+<!-- cart.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Корзина — Slanec Georgia</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">🩴 Slanec Georgia</div>
+  <nav>
+    <a href="index.html">Главная</a>
+    <a href="cart.html">Корзина</a>
+    <a href="about.html">О нас</a>
+    <a href="faq.html">FAQ</a>
+  </nav>
+</header>
+
+<main class="container">
+  <h1 style="text-align:center;margin-bottom:24px;">Корзина</h1>
+
+  <div class="cart-layout">
+    <!-- Левая колонка -->
+    <section class="addons">
+      <h2>Дополнительно</h2>
+      <div class="addons-grid">
+        <div class="addon"><div class="icon">🧴</div><div>Средство для ухода</div><div>8 GEL</div><button onclick="addAddon('Средство для ухода',8)">Добавить</button></div>
+        <div class="addon"><div class="icon">👣</div><div>Антигрибковый спрей</div><div>12 GEL</div><button onclick="addAddon('Антигрибковый спрей',12)">Добавить</button></div>
+        <div class="addon"><div class="icon">🎒</div><div>Чехол для сланцев</div><div>10 GEL</div><button onclick="addAddon('Чехол для сланцев',10)">Добавить</button></div>
+        <div class="addon"><div class="icon">🧦</div><div>Носки пляжные</div><div>7 GEL</div><button onclick="addAddon('Носки пляжные',7)">Добавить</button></div>
+        <div class="addon"><div class="icon">🧼</div><div>Мыло для обуви</div><div>5 GEL</div><button onclick="addAddon('Мыло для обуви',5)">Добавить</button></div>
+        <div class="addon"><div class="icon">☀️</div><div>Спрей от запаха</div><div>9 GEL</div><button onclick="addAddon('Спрей от запаха',9)">Добавить</button></div>
+        <div class="addon"><div class="icon">🎁</div><div>Сувенир Slanec</div><div>6 GEL</div><button onclick="addAddon('Сувенир Slanec',6)">Добавить</button></div>
+        <div class="addon"><div class="icon">🪡</div><div>Ремонтный набор</div><div>15 GEL</div><button onclick="addAddon('Ремонтный набор',15)">Добавить</button></div>
+      </div>
+    </section>
+
+    <!-- Правая колонка -->
+    <section class="cart-items">
+      <h2>Ваши товары</h2>
+      <div id="itemsList"></div>
+      <p id="noSlippers" class="hidden" style="margin-top:12px;">Не забудьте добавить сланцы.</p>
+
+      <div class="purchase-options">
+        <label>
+          <input type="radio" name="delivery" value="pickup" onchange="renderCart()">
+          Самовывоз
+        </label>
+        <label>
+          <input type="radio" name="delivery" value="delivery" onchange="renderCart()">
+          С доставкой
+        </label>
+      </div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="cart-actions">
+        <button onclick="clearCart()" class="order-btn small">Очистить корзину</button>
+        <a href="payment.html" class="pay-link">
+          <button id="payBtn" class="order-btn small">Оплата</button>
+        </a>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  © 2026 Slanec Georgia. Все права защищены.
+</footer>
+
+<script>
+function getCart() {
+  return JSON.parse(localStorage.getItem('cart') || '[]');
+}
+
+function saveCart(cart) {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function getDelivery() {
+  return localStorage.getItem('delivery') || 'pickup';
+}
+
+function saveDelivery(value) {
+  localStorage.setItem('delivery', value);
+}
+
+function addAddon(name, price) {
+  const cart = getCart();
+  cart.push({ type: 'addon', name, price });
+  saveCart(cart);
+  renderCart();
+}
+
+function removeItem(index) {
+  const cart = getCart();
+  cart.splice(index, 1);
+  saveCart(cart);
+  renderCart();
+}
+
+function clearCart() {
+  localStorage.removeItem('cart');
+  renderCart();
+}
+
+function renderCart() {
+  const cart = getCart();
+  const list = document.getElementById('itemsList');
+  const summary = document.getElementById('summary');
+  const noSlippers = document.getElementById('noSlippers');
+  const payBtn = document.getElementById('payBtn');
+
+  list.innerHTML = '';
+  summary.innerHTML = '';
+
+  let total = 0;
+  let hasSlippers = false;
+
+  cart.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+
+    if (!item.type) {
+      hasSlippers = true;
+      total += 95;
+      div.innerHTML = `
+        <div>
+          <strong>Сланцы</strong><br>
+          Размер: ${item.size}<br>
+          Форма: ${item.shape}<br>
+          Подошва: ${item.soleColor}<br>
+          Ремешок: ${item.strapColor}<br>
+          ${item.comment ? `Комментарий: ${item.comment}<br>` : ''}
+          Цена: 95 GEL
+        </div>
+        <button onclick="removeItem(${i})">×</button>
+      `;
+    } else {
+      total += item.price;
+      div.innerHTML = `
+        <div>
+          <strong>${item.name}</strong><br>
+          Цена: ${item.price} GEL
+        </div>
+        <button onclick="removeItem(${i})">×</button>
+      `;
+    }
+
+    list.appendChild(div);
+  });
+
+  noSlippers.classList.toggle('hidden', hasSlippers);
+  payBtn.disabled = !hasSlippers;
+
+  const delivery = document.querySelector('input[name="delivery"]:checked').value;
+  saveDelivery(delivery);
+
+  if (delivery === 'delivery') {
+    summary.innerHTML = `
+      Цена доставки: 5 GEL<br>
+      <strong>Итого: ${total + 5} GEL</strong>
+    `;
+  } else {
+    summary.innerHTML = `<strong>Итого: ${total} GEL</strong>`;
+  }
+}
+
+/* восстановление доставки */
+(function restoreDelivery() {
+  const saved = getDelivery();
+  const radio = document.querySelector(`input[name="delivery"][value="${saved}"]`);
+  if (radio) radio.checked = true;
+})();
+
+renderCart();
+</script>
+
+<style>
+.cart-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.addons-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.addon,.cart-item{background:#f0f0f0;padding:12px;border-radius:8px}
+.cart-item{display:flex;justify-content:space-between;margin-bottom:12px}
+.icon{font-size:24px}
+
+.cart-actions{
+  display:flex;
+  gap:12px;
+  margin-top:16px;
+}
+
+.cart-actions > *{
+  flex:1;
+}
+
+.order-btn.small{
+  width:100%;
+}
+
+.pay-link{
+  display:block;
+}
+
+button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+</style>
+
+</body>
+</html>
